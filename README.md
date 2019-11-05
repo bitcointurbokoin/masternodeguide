@@ -1,6 +1,3 @@
-# masternodeguide
-Masternode Guide
-
 Bitcoin Turbo Koin Masternode Setup Guide
 ==========================
 
