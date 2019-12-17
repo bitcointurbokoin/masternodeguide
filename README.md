@@ -54,7 +54,7 @@ masternode outputs
 
 OS | Path to BTK
 ------------ | -------------
-Windows | `%Appdata%/BTK/`
+Windows | `%Appdata%/Roaming/BTK/`
 macOS | `~/Library/Application\ Support/BTK/`
 Linux | `~/.btk/`
 
@@ -87,7 +87,7 @@ cd ~
 **Step 2:** From your home directory, download the latest version from the BTK GitHub repository:
 
 ```
-wget https://github.com/bitcointurbokoin/btkblockchain/releases/download/v2.0/btk-x86_64-linux-gnu.tar.gz
+wget https://github.com/bitcointurbokoin/btkblockchain/releases/download/v2.1/btk-x86_64-linux-gnu.tar.gz
 ```
 
 Always check the releases page for the latest version and update the URL to reflect the most current version.
@@ -115,3 +115,112 @@ cd ~/btk/bin
 ```
 ./btk-cli stop
 ```
+
+**Step 7:** Navigate to the btk data directory:
+
+```
+cd ~/.btk
+```
+
+**Step 8:** Open the configuration file by typing:
+
+```
+nano btk.conf
+```
+
+**Step 9:** Make the config look like this with your values:
+
+```
+rpcuser=long_random_username
+rpcpassword=longer_random_password
+rpcallowip=127.0.0.1
+server=1
+daemon=1
+logtimestamps=1
+maxconnections=256
+masternode=1
+externalip=Your VPS unique public ip address
+masternodeprivkey=Result of Step 1
+```
+
+*Make sure to replace rpcuser and rpcpassword with your own.*
+
+**Step 10:** Save and exit the file:
+
+```
+Ctr+x to exit and press Y to save changes and press enter to close
+```
+
+**Please be sure to have port 41242 open on your server firewall if applicable for your control wallet to be able start the masternode remotely.**
+
+## Start the Masternode
+
+**Step 1:** Navigate back to the Bitcoin Turbo Koin daemon location:
+
+```
+cd ~/btk/bin
+```
+
+**Step 2:** Start the wallet daemon:
+
+```
+./btkd
+```
+
+**Step 3:** From the Control wallet debug console:
+
+```
+startmasternode alias false myalias
+```
+
+Where "myalias" is the name of your masternode alias (without brackets)
+
+**The following should appear.**
+
+```
+"overall" : "Successfully started 1 masternodes, failed to start 0, total 1",
+"detail" : [
+  {
+    "alias" : "<myalias>",
+    "result" : "successful",
+    "error" : ""
+  }
+]
+```
+
+**Step 4:** Back in the VPS (remote wallet), start the masternode:
+
+```
+./btk-cli startmasternode local false
+```
+
+**Step 5:** Use the following command to check status:
+
+```
+./btk-cli masternode status
+```
+
+You should see something like:
+
+```
+{
+  "txhash": "c2f85b71a04d111a1ca337fbc3aed1168856e3365b4e846ac9b89a9908c15b1d",
+  "outputidx": 1,
+  "netaddr": "34.179.22.255:41242 ,
+  "addr": "K2S1Z8JbaDDHTEKnMLd3exqv7n8VBKs9i4",
+  "status": 4,
+  "message": "Masternode successfully started"
+}
+```
+
+If you see status Not capable masternode: Hot node, waiting for remote activation, you need to wait a bit longer for the blockchain to reach consensus. It's common to take 60 to 120 minutes before the activation can be done. You can also try restarting the VPS wallet and trying the startmasternode local false again.
+
+Bitcoin Turbo Koin Masternode Setup is Complete!
+
+
+## Tearing down a Masternode
+
+1. `./btk-cli stop` from the masternode to stop the wallet.
+1. Then from your control wallet, edit your masternode.conf, delete the MN1 masternode line entry.
+1. Restart the control wallet.
+1. Your 10,000 BTK will now be unlocked.
